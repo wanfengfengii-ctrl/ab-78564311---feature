@@ -1,0 +1,18 @@
+{
+  "name": "paper-light-review",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "纸本文物外借展陈紫外灯联动复核（静态站点）",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test",
+    "verify": "sh scripts/verify.sh"
+  },
+  "devDependencies": {
+    "linkedom": "^0.18.13",
+    "vite": "^5.4.10"
+  }
+}

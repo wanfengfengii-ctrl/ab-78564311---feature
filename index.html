@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>纸本文物外借展陈 · 紫外灯光联动复核</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>纸本文物外借展陈 · 紫外灯光联动复核</h1>
+    <p class="sub">
+      录入各展柜的滑动暴露窗口、累计剂量上限与每盏灯的左闭右开启停区间
+      <code>[启动, 停止)</code> 及紫外照度；系统在<b>连续时间</b>上将全部灯叠加为分段恒定照度，
+      精确积分求任意指定长度滑动窗口的最大剂量（全程使用精确有理数，不采用固定采样点）。
+    </p>
+    <p class="units">时间单位：小时 h ｜ 照度：μW/cm² ｜ 剂量：μW·h/cm²</p>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <button type="button" id="btn-add-case" class="btn">＋ 添加展柜</button>
+      <button type="button" id="btn-review" class="btn btn-primary">发起复核</button>
+      <span id="save-state" class="save-state"></span>
+    </div>
+
+    <section id="errors" class="errors" hidden></section>
+    <section id="verdict"></section>
+    <section id="cases"></section>
+  </main>
+
+  <footer class="foot">
+    草稿与最近一次有效复核结果仅保存在本机浏览器；草稿一经修改，旧复核结论立即失效，需重新发起复核。
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+services:
+  web:
+    build:
+      context: .
+      target: web
+    image: paper-light-web
+    environment:
+      # 健康检查路径由 nginx 提供
+      - NGINX_ENTRYPOINT_QUIET_LOGS=1
+    ports:
+      # 宿主机端口可通过环境变量 HOST_PORT 配置，默认 8080
+      - "${HOST_PORT:-8080}:80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://127.0.0.1/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+    labels:
+      - "描述=纸本文物紫外灯联动复核静态站点"
+
+  verify:
+    build:
+      context: .
+      target: verify
+    image: paper-light-verify
+    depends_on:
+      # 仅需 web 镜像构建完成即可；页面检查直接请求 web 服务名
+      web:
+        condition: service_healthy
+    environment:
+      - CHECK_URL=http://web/
+    restart: "no"
+    # 一次性服务：跑完逻辑校验、生产构建、页面可访问检查后自行退出，
+    # 退出码即校验结论（0 通过 / 非 0 失败）。
