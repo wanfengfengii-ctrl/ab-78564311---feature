@@ -42,6 +42,8 @@ main { max-width: 1180px; margin: 0 auto; padding: 18px 20px 60px; }
 .btn:disabled { opacity: .45; cursor: not-allowed; }
 .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 .btn-primary:hover { background: #1e40af; }
+.btn-recovery { background: #0f766e; border-color: #0f766e; color: #fff; font-weight: 600; }
+.btn-recovery:hover { background: #115e59; }
 .btn-mini {
   border: 1px solid var(--line); background: #fafbfc; border-radius: 6px;
   padding: 3px 9px; font-size: 12.5px; cursor: pointer; color: #374151;
@@ -85,6 +87,14 @@ input.invalid, .fld.invalid input {
   border-color: var(--bad) !important; background: var(--bad-bg);
 }
 .err-text { color: var(--bad); font-size: 12.5px; margin: 4px 0 0; }
+
+/* 恢复参数（剂量复核合格后开放） */
+.recovery-params {
+  margin: 10px 0 2px; border: 1px dashed #99d5cf; border-radius: 10px;
+  background: #f0fdfa; padding: 8px 12px 2px;
+}
+.recovery-params .rp-title { font-size: 12.5px; color: #0f766e; font-weight: 600; margin-bottom: 6px; }
+.recovery-report h4 { color: #0f766e; }
 
 /* 错误清单 */
 .errors {

@@ -116,6 +116,8 @@ export function makeCase(idx) {
     winLen: '',
     winLimit: '',
     totalLimit: '',
+    recoveryRate: '', // 纸张光损恢复系数 k：每小时恢复的残余负担（剂量/h）
+    burdenLimit: '',  // 允许残余负担（剂量）
     lamps: [makeLamp(1), makeLamp(2), makeLamp(3)],
   };
 }
@@ -210,6 +212,55 @@ export function validateDraft(draft) {
     (a.caseIdx ?? -1) - (b.caseIdx ?? -1) ||
     (a.lampIdx ?? -1) - (b.lampIdx ?? -1) ||
     (a.rowIdx ?? -1) - (b.rowIdx ?? -1));
+
+  return { ok: errors.length === 0, errors };
+}
+
+/* ---------------- 恢复复核：恢复参数校验（一次列出全部问题并阻止复核） ---------------- */
+
+// 读取“必须为正”的恢复参数，区分 缺失 / 非有限数值 / 非正 三类非法
+function readPositiveParam(raw) {
+  const s = String(raw ?? '').trim();
+  if (!s) return { error: 'missing' };
+  if (!/^-?\d+(?:\.\d+)?$/.test(s)) return { error: 'nonfinite' };
+  const neg = s.startsWith('-');
+  const r = Rat.fromString(neg ? s.slice(1) : s);
+  if (neg || r.isZero()) return { error: 'nonpositive' };
+  return { value: r };
+}
+
+export function validateRecovery(draft) {
+  const errors = [];
+  const add = (caseIdx, field, msg) => errors.push({ caseIdx, lampIdx: null, rowIdx: null, field, msg });
+
+  if (!draft || typeof draft !== 'object' || !Array.isArray(draft.cases)) {
+    return { ok: false, errors: [{ caseIdx: null, lampIdx: null, rowIdx: null, field: null, msg: '草稿结构损坏，无法复核' }] };
+  }
+
+  draft.cases.forEach((cs, ci) => {
+    if (!cs || typeof cs !== 'object') { add(ci, null, `第 ${ci + 1} 柜：展柜数据损坏`); return; }
+    const where = `第 ${ci + 1} 柜「${cs.name || '未命名'}」`;
+
+    const rate = readPositiveParam(cs.recoveryRate);
+    if (rate.error === 'missing') add(ci, 'recoveryRate', `${where}：纸张光损恢复系数缺失`);
+    else if (rate.error === 'nonfinite') add(ci, 'recoveryRate', `${where}：恢复系数“${String(cs.recoveryRate).trim()}”不是有限数值`);
+    else if (rate.error === 'nonpositive') add(ci, 'recoveryRate', `${where}：恢复系数必须为正（大于 0），当前为非正数值`);
+
+    const lim = readPositiveParam(cs.burdenLimit);
+    if (lim.error === 'missing') add(ci, 'burdenLimit', `${where}：允许残余负担限额缺失`);
+    else if (lim.error === 'nonfinite') add(ci, 'burdenLimit', `${where}：允许残余负担“${String(cs.burdenLimit).trim()}”不是有限数值`);
+    else if (lim.error === 'nonpositive') add(ci, 'burdenLimit', `${where}：允许残余负担限额必须为正（大于 0），当前为非正数值`);
+
+    // 负担限额合理性：残余负担恒不超过累计剂量，限额大于累计剂量上限即不合理
+    if (lim.value) {
+      try {
+        const totalLimit = Rat.read(cs.totalLimit);
+        if (lim.value.gt(totalLimit)) {
+          add(ci, 'burdenLimit', `${where}：允许残余负担（${lim.value}）大于累计剂量上限（${totalLimit}），负担限额不合理`);
+        }
+      } catch { /* 累计上限自身的非法由剂量复核校验报告 */ }
+    }
+  });
 
   return { ok: errors.length === 0, errors };
 }
@@ -410,4 +461,62 @@ function piecesBetween(segs, a, b) {
     else merged.push(p);
   }
   return merged;
+}
+
+/* ---------------- 恢复复核：残余负担的连续时间推演 ---------------- */
+//
+// 残余负担 B(t) 自该柜记录范围起点 t0 以零负担开始，按已叠加的分段恒定照度 i 推演：
+//   B′(t) = i(t) − k（照射持续累积，同时按恢复系数 k 连续衰减），且 B 不得低于 0。
+// 段内 i 恒定 ⇒ B 为分段线性（斜率 i−k），峰必在分段端点取得，越限时刻在段内
+// 解一次一次方程精确定位——全程精确有理数，不使用任何固定采样点。
+// 返回每段起止负担、峰值及其最早发生时刻、首次越过允许负担的精确时刻证据。
+export function recoverBurden(segs, rate, limit) {
+  const k = rate;
+  const segments = [];
+  let peak = { burden: Rat.ZERO, at: segs.length ? segs[0].t : null };
+  let crossing = null;
+  let B = Rat.ZERO;
+
+  // 严格更大才更新：同值保留最早发生时刻，保证证据稳定可复现
+  const considerPeak = (burden, at) => {
+    if (burden.gt(peak.burden)) peak = { burden, at };
+  };
+
+  for (const sg of segs) {
+    const startBurden = B;
+    considerPeak(startBurden, sg.t);
+    const m = sg.iuv.sub(k); // 段内负担斜率（可正可负）
+    const dur = sg.end.sub(sg.t);
+    let endBurden;
+    let zeroAt = null;
+
+    if (m.gt(Rat.ZERO)) {
+      endBurden = startBurden.add(m.mul(dur));
+      // 负担线性上升：解 B(a) + (i−k)·(t−a) = limit，得首次越限的精确临界时刻
+      // （此前各段负担均未超限，故段起点负担必 ≤ limit）
+      if (!crossing && endBurden.gt(limit)) {
+        const at = startBurden.lt(limit)
+          ? sg.t.add(limit.sub(startBurden).div(m))
+          : sg.t;
+        crossing = { at, burden: limit, iuv: sg.iuv, strictlyAfter: true };
+      }
+    } else if (m.isZero()) {
+      endBurden = startBurden;
+    } else {
+      const raw = startBurden.add(m.mul(dur));
+      if (raw.lt(Rat.ZERO)) {
+        // 段内降至 0 后保持 0（负担不得低于零）
+        zeroAt = sg.t.add(startBurden.div(m.abs()));
+        endBurden = Rat.ZERO;
+      } else {
+        endBurden = raw;
+      }
+    }
+
+    considerPeak(endBurden, sg.end);
+    segments.push({ t: sg.t, end: sg.end, iuv: sg.iuv, startBurden, endBurden, zeroAt });
+    B = endBurden;
+  }
+
+  return { segments, peak, exceeded: Boolean(crossing), crossing };
 }

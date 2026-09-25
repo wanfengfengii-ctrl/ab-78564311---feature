@@ -1,25 +1,41 @@
 import {
   Rat, makeLamp, makeLampRow, makeCase,
 } from './lib/light.js';
-import { runReview } from './lib/review.js';
-import { loadDraft, saveDraft, loadReview, saveReview, clearReview } from './lib/storage.js';
+import { runReview, runRecoveryReview } from './lib/review.js';
+import {
+  loadDraft, saveDraft, loadReview, saveReview, clearReview,
+  loadRecovery, saveRecovery, clearRecovery,
+} from './lib/storage.js';
 
 const state = {
   draft: loadDraft(),
-  review: null, // 仅当与当前草稿指纹一致时才存在
+  review: null, // 剂量复核结论：仅当与当前草稿指纹一致时才存在
   reviewAt: null,
+  recovery: null, // 恢复复核结论：仅当完整草稿（含恢复参数）指纹一致时才存在
+  recoveryAt: null,
   errors: [],
-  touched: false, // 本次打开后是否已改动草稿（用于提示旧结论失效）
+  recoveryErrors: [],
+  touched: false, // 本次打开后是否已改动剂量相关草稿（用于提示旧结论失效）
+  recoveryTouched: false, // 本次打开后是否已改动草稿或恢复参数（恢复结论失效提示）
 };
 
 const saved = loadReview(state.draft);
 if (saved) { state.review = saved.review; state.reviewAt = saved.at; }
+// 恢复结论仅在剂量结论同样有效且合格时才恢复显示
+const savedRecovery = loadRecovery(state.draft);
+if (savedRecovery && state.review?.passed) {
+  state.recovery = savedRecovery.recovery;
+  state.recoveryAt = savedRecovery.at;
+}
 
 const $cases = document.getElementById('cases');
 const $verdict = document.getElementById('verdict');
 const $errors = document.getElementById('errors');
+const $recoveryVerdict = document.getElementById('recovery-verdict');
+const $recoveryErrors = document.getElementById('recovery-errors');
 const $saveState = document.getElementById('save-state');
 const $btnReview = document.getElementById('btn-review');
+const $btnRecovery = document.getElementById('btn-recovery');
 const $btnAddCase = document.getElementById('btn-add-case');
 
 const fmt = (r) => (r instanceof Rat ? r.toString() : String(r));
@@ -36,10 +52,18 @@ function errMap() {
   for (const e of state.errors) m.set(errKey(e.caseIdx, e.lampIdx, e.rowIdx, e.field), e.msg);
   return m;
 }
+function recoveryErrMap() {
+  const m = new Map();
+  for (const e of state.recoveryErrors) m.set(`${e.caseIdx}|${e.field ?? ''}`, e.msg);
+  return m;
+}
 
 function render() {
   const emap = errMap();
   const errAt = (ci, li, ri, field) => emap.get(errKey(ci, li, ri, field));
+  const remp = recoveryErrMap();
+  const recErrAt = (ci, field) => remp.get(`${ci}|${field}`);
+  const recoveryOpen = Boolean(state.review?.passed); // 剂量复核合格后才可补充恢复参数
 
   $cases.innerHTML = state.draft.cases.map((cs, ci) => {
     const caseErr = (field) => errAt(ci, null, null, field);
@@ -91,6 +115,23 @@ function render() {
     }).join('');
 
     const caseCountErr = errAt(ci, null, null, 'lamps');
+    const recCell = (field, label, value, placeholder = '') => {
+      const msg = recErrAt(ci, field);
+      return `
+      <label class="fld ${msg ? 'invalid' : ''}" ${msg ? ` title="${esc(msg)}"` : ''}>
+        <span>${label}</span>
+        <input type="text" inputmode="decimal" data-ci="${ci}" data-field="${field}"
+               value="${esc(value ?? '')}" placeholder="${placeholder}" />
+      </label>`;
+    };
+    const recoveryParams = recoveryOpen ? `
+      <div class="recovery-params">
+        <div class="rp-title">纸张恢复参数（剂量复核已合格，可发起恢复复核）</div>
+        <div class="case-fields">
+          ${recCell('recoveryRate', '光损恢复系数 k（每小时恢复的残余负担）', cs.recoveryRate, '如 1')}
+          ${recCell('burdenLimit', '允许残余负担', cs.burdenLimit, 'μW·h/cm²')}
+        </div>
+      </div>` : '';
     return `
     <article class="case" data-ci="${ci}">
       <header class="case-head">
@@ -104,17 +145,22 @@ function render() {
         ${cell('winLimit', '最大窗口剂量限额', cs.winLimit, 'μW·h/cm²')}
         ${cell('totalLimit', '累计剂量上限', cs.totalLimit, 'μW·h/cm²')}
       </div>
+      ${recoveryParams}
       ${caseCountErr ? `<p class="err-text">${esc(caseCountErr)}</p>` : ''}
       <div class="lamps">${lamps}</div>
       <button type="button" class="btn-mini" data-act="add-lamp" data-ci="${ci}"
               ${cs.lamps.length >= 8 ? 'disabled' : ''}>＋ 添加灯（${cs.lamps.length}/8，需 3–8 盏）</button>
       ${renderReport(ci)}
+      ${renderRecoveryReport(ci)}
     </article>`;
   }).join('');
 
   $btnAddCase.disabled = state.draft.cases.length >= 6;
+  $btnRecovery.hidden = !recoveryOpen;
   renderErrors();
+  renderRecoveryErrors();
   renderVerdict();
+  renderRecoveryVerdict();
 }
 
 function eventsText(p) {
@@ -182,6 +228,46 @@ function renderReport(ci) {
   </div>`;
 }
 
+// 恢复复核逐柜报告：峰值及发生时刻、每段起止负担
+function renderRecoveryReport(ci) {
+  const r = state.recovery?.reports?.[ci];
+  if (!r) return '';
+  const tBadge = (bad) => bad ? 'badge bad' : 'badge good';
+  const tWord = (bad) => bad ? '越限' : '合规';
+  const segRows = r.segments.map((s) => `
+        <tr${s.iuv.isZero() ? ' class="zero"' : ''}>
+          <td>${fmt(s.t)}</td>
+          <td>${fmt(s.end)}</td>
+          <td>${fmt(s.iuv)}</td>
+          <td>${fmt(s.startBurden)}</td>
+          <td>${fmt(s.endBurden)}</td>
+          <td>${s.zeroAt ? `段内 ${fmt(s.zeroAt)} h 降至 0 后保持` : '—'}</td>
+        </tr>`).join('');
+  return `
+  <div class="report recovery-report">
+    <h4>恢复复核结果 · ${esc(r.name)}</h4>
+    <div class="rep-block">
+      <div class="rep-title">残余负担推演（自记录起点零负担开始）
+        <span class="${tBadge(r.exceeded)}">${tWord(r.exceeded)}</span>
+      </div>
+      <p class="kv">恢复系数 k = <b>${fmt(r.rate)}</b> (μW·h/cm²)/h ｜ 允许残余负担 <b>${fmt(r.limit)}</b> μW·h/cm²</p>
+      ${r.scheduleStart ? `
+      <p class="kv">推演范围：${fmt(r.scheduleStart)} h 至 ${fmt(r.scheduleEnd)} h（起始负担 0）</p>
+      <p class="kv">峰值残余负担：<b class="${r.exceeded ? 'num-bad' : 'num-good'}">${fmt(r.peak.burden)}</b>
+        μW·h/cm²，最早发生于 <b>${fmt(r.peak.at)}</b> h</p>
+      ${r.exceeded && r.crossing ? `
+        <p class="kv crossing">首次越限时刻：<b>${fmt(r.crossing.at)}</b> h
+          （越限时照度 ${fmt(r.crossing.iuv)} μW/cm²；恢复后的残余负担 ${fmt(r.crossing.burden)}，恰达允许负担 ${fmt(r.limit)}）</p>` : ''}
+      <details open><summary>逐段残余负担（共 ${r.segments.length} 段，段内线性、不得低于 0）</summary>
+        <table class="pieces">
+          <thead><tr><th>起 t (h)</th><th>止 (h)</th><th>紫外照度 (μW/cm²)</th><th>段始负担</th><th>段末负担</th><th>备注</th></tr></thead>
+          <tbody>${segRows}</tbody>
+        </table>
+      </details>` : '<p class="muted">本柜无任何点亮区间，残余负担全程为 0。</p>'}
+    </div>
+  </div>`;
+}
+
 function renderVerdict() {
   if (!state.review) {
     $verdict.innerHTML = state.touched
@@ -228,6 +314,51 @@ function renderErrors() {
     <ol>${state.errors.map((e) => `<li>${esc(e.msg)}</li>`).join('')}</ol>`;
 }
 
+function renderRecoveryVerdict() {
+  // 剂量复核未合格时，恢复复核区域整体不出现
+  if (!state.review?.passed) { $recoveryVerdict.innerHTML = ''; return; }
+  if (!state.recovery) {
+    $recoveryVerdict.innerHTML = state.recoveryTouched
+      ? '<div class="banner stale">草稿或恢复参数已修改：此前的恢复复核结论已失效，已不在页面显示；请重新「发起恢复复核」。</div>'
+      : '';
+    return;
+  }
+  const at = state.recoveryAt ? new Date(state.recoveryAt).toLocaleString() : '';
+  if (state.recovery.passed) {
+    $recoveryVerdict.innerHTML = `
+      <div class="banner pass">
+        <b>恢复复核通过</b>：全部 ${state.recovery.reports.length} 个展柜的残余负担全程未越过允许负担，展陈方案可恢复。
+        <span class="at">最近有效恢复复核：${at}</span>
+      </div>`;
+  } else {
+    const e = state.recovery.firstEvidence;
+    $recoveryVerdict.innerHTML = `
+      <div class="banner fail">
+        <b>恢复复核不通过</b>：共 ${state.recovery.violations.length} 个展柜残余负担越限（总剂量合格但短时连续照射未能恢复）。
+        <span class="at">最近有效恢复复核：${at}</span>
+      </div>
+      <div class="evidence">
+        <h4>恢复复核首项证据（稳定确定）</h4>
+        <p>按<b>展柜输入顺序</b>优先、同柜内再按<b>首次越限时刻</b>升序确定：</p>
+        <ul>
+          <li>展柜：第 ${e.caseIdx + 1} 柜「${esc(e.caseName)}」</li>
+          <li>首次越限时刻：<b class="num-bad">${fmt(e.crossing)}</b> h
+              （该时刻${e.strictlyAfter ? '之后' : '起'}残余负担超过允许负担 ${fmt(e.limit)}）</li>
+          <li>越限时照度：<b>${fmt(e.iuv)}</b> μW/cm²；恢复后的残余负担：<b class="num-bad">${fmt(e.burden)}</b> μW·h/cm²（恰达允许负担）</li>
+          <li>该柜恢复系数 k = ${fmt(e.rate)} (μW·h/cm²)/h；峰值残余负担 ${fmt(e.peak.burden)}，最早发生于 ${fmt(e.peak.at)} h</li>
+        </ul>
+      </div>`;
+  }
+}
+
+function renderRecoveryErrors() {
+  if (!state.recoveryErrors.length) { $recoveryErrors.hidden = true; $recoveryErrors.innerHTML = ''; return; }
+  $recoveryErrors.hidden = false;
+  $recoveryErrors.innerHTML = `
+    <h3>无法发起恢复复核：请一次性处理以下 ${state.recoveryErrors.length} 项恢复参数问题</h3>
+    <ol>${state.recoveryErrors.map((e) => `<li>${esc(e.msg)}</li>`).join('')}</ol>`;
+}
+
 /* ---------------- 交互 ---------------- */
 
 function persist() {
@@ -241,7 +372,18 @@ function markDirty() {
     state.reviewAt = null;
     clearReview();
   }
+  markRecoveryDirty(); // 剂量相关草稿改动同样使恢复结论失效
   state.touched = true;
+}
+
+// 仅恢复参数改动：恢复结论失效，剂量复核结论保持有效
+function markRecoveryDirty() {
+  if (state.recovery) {
+    state.recovery = null;
+    state.recoveryAt = null;
+    clearRecovery();
+  }
+  state.recoveryTouched = true;
 }
 
 document.addEventListener('input', (ev) => {
@@ -252,13 +394,15 @@ document.addEventListener('input', (ev) => {
   const ri = el.dataset.ri;
   const { field } = el.dataset;
   const cs = state.draft.cases[ci];
+  const isRecoveryParam = li === undefined && (field === 'recoveryRate' || field === 'burdenLimit');
   if (li === undefined) cs[field] = el.value;
   else if (ri === undefined) cs.lamps[+li][field] = el.value;
   else cs.lamps[+li].rows[+ri][field] = el.value;
-  markDirty();
+  if (isRecoveryParam) markRecoveryDirty(); else markDirty();
   persist();
   // 每次改动都重渲染：确保旧复核结论立即从页面消失、字段错误态即时刷新
   state.errors = [];
+  state.recoveryErrors = [];
   const caret = el.selectionStart;
   render();
   refocus(el, caret);
@@ -337,6 +481,7 @@ $btnReview.addEventListener('click', () => {
     state.review = null;
     state.reviewAt = null;
     clearReview();
+    markRecoveryDirty(); // 草稿非法时恢复结论同样不得显示
     render();
     $errors.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
@@ -348,6 +493,28 @@ $btnReview.addEventListener('click', () => {
   saveReview(state.draft, res);
   render();
   $verdict.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+$btnRecovery.addEventListener('click', () => {
+  // 恢复复核须以当前有效的合格剂量复核结论为前提
+  if (!state.review || !state.review.passed) return;
+  const res = runRecoveryReview(state.draft);
+  if (!res.ok) {
+    state.recoveryErrors = res.errors;
+    state.recovery = null;
+    state.recoveryAt = null;
+    clearRecovery();
+    render();
+    $recoveryErrors.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+  state.recoveryErrors = [];
+  state.recovery = res;
+  state.recoveryAt = res.at;
+  state.recoveryTouched = false;
+  saveRecovery(state.draft, res);
+  render();
+  $recoveryVerdict.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
 render();
