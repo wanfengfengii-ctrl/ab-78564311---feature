@@ -137,6 +137,14 @@ test('DOM：非法区间、重复灯号、不合理限额一次列出并阻止�
   assert.doesNotMatch(document.querySelector('#verdict').textContent, /首项证据/);
 });
 
+function fillRecoveryParams(document, k = '1', limit = '5') {
+  document.querySelectorAll('article.case').forEach((art) => {
+    const ci = art.dataset.ci;
+    setValue(document, `[data-ci="${ci}"][data-field="recovery"]`, k);
+    setValue(document, `[data-ci="${ci}"][data-field="residLimit"]`, limit);
+  });
+}
+
 test('DOM：添加/删除展柜与灯的数量边界（2–6 柜、3–8 灯）', async () => {
   const { document } = await freshEnv();
   // 初始 2 柜：删柜按钮禁用（下限）
@@ -158,4 +166,107 @@ test('DOM：添加/删除展柜与灯的数量边界（2–6 柜、3–8 灯）'
   const art = document.querySelector('article.case');
   assert.equal(art.querySelectorAll('.lamp').length, 8);
   assert.equal(art.querySelector('[data-act="add-lamp"]').disabled, true);
+});
+
+test('DOM：剂量复核合格后才可发起恢复复核，逐柜展示峰值/时刻/逐段负担', async () => {
+  const { document } = await freshEnv();
+  // 未做剂量复核：恢复复核按钮禁用
+  assert.equal(document.getElementById('btn-recovery').disabled, true);
+
+  fillValidDraft(document);
+  fillRecoveryParams(document, '1', '5');
+  document.getElementById('btn-review').dispatchEvent(new window.Event('click', { bubbles: true }));
+  assert.match(document.querySelector('#verdict').textContent, /剂量复核通过/);
+  // 剂量合格后按钮可用（仅改恢复参数不应使剂量结论失效）
+  assert.equal(document.getElementById('btn-recovery').disabled, false);
+
+  // 默认方案：i=3 持续 2h，k=1 → 峰值 3(1−e^−2)=2.59 < 5 → 通过
+  document.getElementById('btn-recovery').dispatchEvent(new window.Event('click', { bubbles: true }));
+  assert.match(document.querySelector('#recovery-verdict').textContent, /恢复复核通过/);
+  const recReports = document.querySelectorAll('.recovery-report');
+  assert.equal(recReports.length, 2);
+  assert.match(recReports[0].textContent, /残余负担峰值/);
+  assert.match(recReports[0].textContent, /发生于[\s\S]*2(\s|h)/);
+  // 逐段起止负担表头与首段：起点负担为 0
+  assert.match(recReports[0].textContent, /段起残余负担[\s\S]*段止残余负担/);
+  const firstRow = recReports[0].querySelectorAll('table.recovery-pieces tbody tr')[0];
+  const cells = firstRow.querySelectorAll('td');
+  assert.equal(cells[4].textContent, '0'); // 段起负担
+});
+
+test('DOM：恢复复核辨识总剂量合格却短时连续照射的方案，给出稳定首项证据', async () => {
+  const { document } = await freshEnv();
+  fillValidDraft(document);
+  fillRecoveryParams(document, '0.5', '7');
+  // 第 1 柜改为短时高照度 [0,1) i=10：总剂量 10 仍远低于限额 100/窗口 9? 窗口 2h 剂量 10 > 9
+  // 故同步放宽窗口限额，确保剂量复核合格
+  setValue(document, '[data-ci="0"][data-field="winLimit"]', '100');
+  for (let li = 0; li < 3; li++) {
+    setValue(document, `[data-ci="0"][data-li="${li}"][data-ri="0"][data-field="on"]`, '0');
+    setValue(document, `[data-ci="0"][data-li="${li}"][data-ri="0"][data-field="off"]`, '1');
+    setValue(document, `[data-ci="0"][data-li="${li}"][data-ri="0"][data-field="iuv"]`, li === 0 ? '10' : '0');
+  }
+  document.getElementById('btn-review').dispatchEvent(new window.Event('click', { bubbles: true }));
+  assert.match(document.querySelector('#verdict').textContent, /剂量复核通过/);
+
+  document.getElementById('btn-recovery').dispatchEvent(new window.Event('click', { bubbles: true }));
+  const v = document.querySelector('#recovery-verdict');
+  assert.match(v.textContent, /恢复复核不通过/);
+  assert.match(v.textContent, /第 1 柜/);
+  assert.match(v.textContent, /越限时紫外照度[\s\S]*10/);
+  assert.match(v.textContent, /恢复后的残余负担/);
+  // 首次越限时刻 0.861…
+  assert.match(v.textContent, /首次越限时刻[\s\S]*0\.86/);
+});
+
+test('DOM：恢复参数缺失/非正/限额为零时一次列出并阻止，剂量复核仍可用', async () => {
+  const { document } = await freshEnv();
+  fillValidDraft(document);
+  // 第 1 柜：k=0（非正）；第 2 柜：限额留空
+  setValue(document, '[data-ci="0"][data-field="recovery"]', '0');
+  setValue(document, '[data-ci="0"][data-field="residLimit"]', '5');
+  setValue(document, '[data-ci="1"][data-field="recovery"]', '1');
+  setValue(document, '[data-ci="1"][data-field="residLimit"]', '');
+  document.getElementById('btn-review').dispatchEvent(new window.Event('click', { bubbles: true }));
+  assert.match(document.querySelector('#verdict').textContent, /剂量复核通过/);
+  assert.equal(document.getElementById('btn-recovery').disabled, false);
+
+  document.getElementById('btn-recovery').dispatchEvent(new window.Event('click', { bubbles: true }));
+  const box = document.getElementById('recovery-errors');
+  assert.equal(box.hidden, false);
+  const text = box.textContent;
+  assert.match(text, /恢复系数必须大于 0/);
+  assert.match(text, /允许残余负担缺失/);
+  // 阻止恢复复核：无恢复结论与恢复报告
+  assert.doesNotMatch(document.querySelector('#recovery-verdict').textContent, /恢复复核通过|恢复复核不通过/);
+  assert.equal(document.querySelectorAll('.recovery-report').length, 0);
+  // 剂量结论不受影响，仍展示
+  assert.match(document.querySelector('#verdict').textContent, /剂量复核通过/);
+  assert.equal(document.querySelectorAll('.report:not(.recovery-report)').length, 2);
+});
+
+test('DOM：草稿或恢复参数改动后旧恢复结论立即消失；剂量不合格时恢复入口禁用', async () => {
+  const { document } = await freshEnv();
+  fillValidDraft(document);
+  fillRecoveryParams(document, '1', '5');
+  document.getElementById('btn-review').dispatchEvent(new window.Event('click', { bubbles: true }));
+  document.getElementById('btn-recovery').dispatchEvent(new window.Event('click', { bubbles: true }));
+  assert.match(document.querySelector('#recovery-verdict').textContent, /恢复复核通过/);
+
+  // 只改恢复参数：恢复结论消失并提示失效，剂量结论保留
+  const el = document.querySelector('[data-ci="0"][data-field="residLimit"]');
+  el.value = '4';
+  el.dispatchEvent(new window.Event('input', { bubbles: true }));
+  assert.match(document.querySelector('#recovery-verdict').textContent, /恢复复核结论已失效/);
+  assert.equal(document.querySelectorAll('.recovery-report').length, 0);
+  assert.match(document.querySelector('#verdict').textContent, /剂量复核通过/);
+
+  // 再把剂量草稿改坏（窗口限额低于实际剂量）：恢复入口禁用
+  const wl = document.querySelector('[data-ci="0"][data-field="winLimit"]');
+  wl.value = '1';
+  wl.dispatchEvent(new window.Event('input', { bubbles: true }));
+  assert.equal(document.getElementById('btn-recovery').disabled, true);
+  document.getElementById('btn-review').dispatchEvent(new window.Event('click', { bubbles: true }));
+  assert.match(document.querySelector('#verdict').textContent, /剂量复核不通过/);
+  assert.equal(document.getElementById('btn-recovery').disabled, true);
 });

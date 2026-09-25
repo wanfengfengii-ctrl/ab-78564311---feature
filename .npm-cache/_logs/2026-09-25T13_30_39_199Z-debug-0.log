@@ -1,0 +1,380 @@
+0 verbose cli /usr/local/bin/node /usr/local/bin/npm
+1 info using npm@10.8.2
+2 info using node@v22.23.2
+3 silly config load:file:/usr/local/lib/node_modules/npm/npmrc
+4 silly config load:file:/workspace/.npmrc
+5 silly config load:file:/home/node/.npmrc
+6 silly config load:file:/usr/local/etc/npmrc
+7 verbose title npm install
+8 verbose argv "install" "--cache" ".npm-cache"
+9 verbose logfile logs-max:10 dir:/workspace/.npm-cache/_logs/2026-09-25T13_30_39_199Z-
+10 verbose logfile /workspace/.npm-cache/_logs/2026-09-25T13_30_39_199Z-debug-0.log
+11 silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+12 silly logfile done cleaning log files
+13 silly idealTree buildDeps
+14 silly reify moves {}
+15 silly audit bulk request {
+15 silly audit   '@esbuild/aix-ppc64': [ '0.21.5' ],
+15 silly audit   '@esbuild/android-arm': [ '0.21.5' ],
+15 silly audit   '@esbuild/android-arm64': [ '0.21.5' ],
+15 silly audit   '@esbuild/android-x64': [ '0.21.5' ],
+15 silly audit   '@esbuild/darwin-arm64': [ '0.21.5' ],
+15 silly audit   '@esbuild/darwin-x64': [ '0.21.5' ],
+15 silly audit   '@esbuild/freebsd-arm64': [ '0.21.5' ],
+15 silly audit   '@esbuild/freebsd-x64': [ '0.21.5' ],
+15 silly audit   '@esbuild/linux-arm': [ '0.21.5' ],
+15 silly audit   '@esbuild/linux-arm64': [ '0.21.5' ],
+15 silly audit   '@esbuild/linux-ia32': [ '0.21.5' ],
+15 silly audit   '@esbuild/linux-loong64': [ '0.21.5' ],
+15 silly audit   '@esbuild/linux-mips64el': [ '0.21.5' ],
+15 silly audit   '@esbuild/linux-ppc64': [ '0.21.5' ],
+15 silly audit   '@esbuild/linux-riscv64': [ '0.21.5' ],
+15 silly audit   '@esbuild/linux-s390x': [ '0.21.5' ],
+15 silly audit   '@esbuild/linux-x64': [ '0.21.5' ],
+15 silly audit   '@esbuild/netbsd-x64': [ '0.21.5' ],
+15 silly audit   '@esbuild/openbsd-x64': [ '0.21.5' ],
+15 silly audit   '@esbuild/sunos-x64': [ '0.21.5' ],
+15 silly audit   '@esbuild/win32-arm64': [ '0.21.5' ],
+15 silly audit   '@esbuild/win32-ia32': [ '0.21.5' ],
+15 silly audit   '@esbuild/win32-x64': [ '0.21.5' ],
+15 silly audit   '@napi-rs/lzma-linux-x64-gnu': [ '1.5.1' ],
+15 silly audit   '@rollup/rollup-android-arm-eabi': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-android-arm64': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-darwin-arm64': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-darwin-x64': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-freebsd-arm64': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-freebsd-x64': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-linux-arm-gnueabihf': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-linux-arm-musleabihf': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-linux-arm64-gnu': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-linux-arm64-musl': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-linux-loong64-gnu': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-linux-loong64-musl': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-linux-ppc64-gnu': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-linux-ppc64-musl': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-linux-riscv64-gnu': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-linux-riscv64-musl': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-linux-s390x-gnu': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-linux-x64-gnu': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-linux-x64-musl': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-openbsd-x64': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-openharmony-arm64': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-win32-arm64-msvc': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-win32-ia32-msvc': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-win32-x64-gnu': [ '4.63.5' ],
+15 silly audit   '@rollup/rollup-win32-x64-msvc': [ '4.63.5' ],
+15 silly audit   '@types/estree': [ '1.0.9' ],
+15 silly audit   boolbase: [ '2.0.0' ],
+15 silly audit   'css-select': [ '7.0.0' ],
+15 silly audit   'css-what': [ '8.0.0' ],
+15 silly audit   cssom: [ '0.5.0' ],
+15 silly audit   'dom-serializer': [ '3.1.1', '2.0.0' ],
+15 silly audit   domelementtype: [ '3.0.0', '2.3.0' ],
+15 silly audit   domhandler: [ '6.0.1', '5.0.3' ],
+15 silly audit   domutils: [ '4.0.2', '3.2.2' ],
+15 silly audit   entities: [ '8.1.0', '4.5.0', '7.0.1' ],
+15 silly audit   esbuild: [ '0.21.5' ],
+15 silly audit   fsevents: [ '2.3.3' ],
+15 silly audit   'html-escaper': [ '3.0.3' ],
+15 silly audit   htmlparser2: [ '10.1.0' ],
+15 silly audit   linkedom: [ '0.18.13' ],
+15 silly audit   nanoid: [ '3.3.19' ],
+15 silly audit   'nth-check': [ '3.0.1' ],
+15 silly audit   picocolors: [ '1.1.1' ],
+15 silly audit   postcss: [ '8.5.28' ],
+15 silly audit   rollup: [ '4.63.5' ],
+15 silly audit   'source-map-js': [ '1.2.1' ],
+15 silly audit   uhyphen: [ '0.2.0' ],
+15 silly audit   vite: [ '5.4.21' ]
+15 silly audit }
+16 verbose reify failed optional dependency /workspace/node_modules/fsevents
+17 silly reify mark deleted [ '/workspace/node_modules/fsevents' ]
+18 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-win32-x64-msvc
+19 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-win32-x64-msvc' ]
+20 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-win32-x64-gnu
+21 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-win32-x64-gnu' ]
+22 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-win32-ia32-msvc
+23 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-win32-ia32-msvc' ]
+24 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-win32-arm64-msvc
+25 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-win32-arm64-msvc' ]
+26 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-openharmony-arm64
+27 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-openharmony-arm64' ]
+28 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-openbsd-x64
+29 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-openbsd-x64' ]
+30 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-linux-x64-musl
+31 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-linux-x64-musl' ]
+32 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-linux-x64-gnu
+33 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-linux-x64-gnu' ]
+34 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-linux-s390x-gnu
+35 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-linux-s390x-gnu' ]
+36 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-linux-riscv64-musl
+37 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-linux-riscv64-musl' ]
+38 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-linux-riscv64-gnu
+39 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-linux-riscv64-gnu' ]
+40 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-linux-ppc64-musl
+41 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-linux-ppc64-musl' ]
+42 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-linux-ppc64-gnu
+43 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-linux-ppc64-gnu' ]
+44 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-linux-loong64-musl
+45 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-linux-loong64-musl' ]
+46 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-linux-loong64-gnu
+47 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-linux-loong64-gnu' ]
+48 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-linux-arm-musleabihf
+49 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-linux-arm-musleabihf' ]
+50 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-linux-arm-gnueabihf
+51 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-linux-arm-gnueabihf' ]
+52 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-freebsd-x64
+53 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-freebsd-x64' ]
+54 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-freebsd-arm64
+55 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-freebsd-arm64' ]
+56 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-darwin-x64
+57 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-darwin-x64' ]
+58 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-darwin-arm64
+59 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-darwin-arm64' ]
+60 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-android-arm64
+61 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-android-arm64' ]
+62 verbose reify failed optional dependency /workspace/node_modules/@rollup/rollup-android-arm-eabi
+63 silly reify mark deleted [ '/workspace/node_modules/@rollup/rollup-android-arm-eabi' ]
+64 verbose reify failed optional dependency /workspace/node_modules/@napi-rs/lzma-linux-x64-gnu
+65 silly reify mark deleted [ '/workspace/node_modules/@napi-rs/lzma-linux-x64-gnu' ]
+66 verbose reify failed optional dependency /workspace/node_modules/@esbuild/win32-x64
+67 silly reify mark deleted [ '/workspace/node_modules/@esbuild/win32-x64' ]
+68 verbose reify failed optional dependency /workspace/node_modules/@esbuild/win32-ia32
+69 silly reify mark deleted [ '/workspace/node_modules/@esbuild/win32-ia32' ]
+70 verbose reify failed optional dependency /workspace/node_modules/@esbuild/win32-arm64
+71 silly reify mark deleted [ '/workspace/node_modules/@esbuild/win32-arm64' ]
+72 verbose reify failed optional dependency /workspace/node_modules/@esbuild/sunos-x64
+73 silly reify mark deleted [ '/workspace/node_modules/@esbuild/sunos-x64' ]
+74 verbose reify failed optional dependency /workspace/node_modules/@esbuild/openbsd-x64
+75 silly reify mark deleted [ '/workspace/node_modules/@esbuild/openbsd-x64' ]
+76 verbose reify failed optional dependency /workspace/node_modules/@esbuild/netbsd-x64
+77 silly reify mark deleted [ '/workspace/node_modules/@esbuild/netbsd-x64' ]
+78 verbose reify failed optional dependency /workspace/node_modules/@esbuild/linux-x64
+79 silly reify mark deleted [ '/workspace/node_modules/@esbuild/linux-x64' ]
+80 verbose reify failed optional dependency /workspace/node_modules/@esbuild/linux-s390x
+81 silly reify mark deleted [ '/workspace/node_modules/@esbuild/linux-s390x' ]
+82 verbose reify failed optional dependency /workspace/node_modules/@esbuild/linux-riscv64
+83 silly reify mark deleted [ '/workspace/node_modules/@esbuild/linux-riscv64' ]
+84 verbose reify failed optional dependency /workspace/node_modules/@esbuild/linux-ppc64
+85 silly reify mark deleted [ '/workspace/node_modules/@esbuild/linux-ppc64' ]
+86 verbose reify failed optional dependency /workspace/node_modules/@esbuild/linux-mips64el
+87 silly reify mark deleted [ '/workspace/node_modules/@esbuild/linux-mips64el' ]
+88 verbose reify failed optional dependency /workspace/node_modules/@esbuild/linux-loong64
+89 silly reify mark deleted [ '/workspace/node_modules/@esbuild/linux-loong64' ]
+90 verbose reify failed optional dependency /workspace/node_modules/@esbuild/linux-ia32
+91 silly reify mark deleted [ '/workspace/node_modules/@esbuild/linux-ia32' ]
+92 verbose reify failed optional dependency /workspace/node_modules/@esbuild/linux-arm
+93 silly reify mark deleted [ '/workspace/node_modules/@esbuild/linux-arm' ]
+94 verbose reify failed optional dependency /workspace/node_modules/@esbuild/freebsd-x64
+95 silly reify mark deleted [ '/workspace/node_modules/@esbuild/freebsd-x64' ]
+96 verbose reify failed optional dependency /workspace/node_modules/@esbuild/freebsd-arm64
+97 silly reify mark deleted [ '/workspace/node_modules/@esbuild/freebsd-arm64' ]
+98 verbose reify failed optional dependency /workspace/node_modules/@esbuild/darwin-x64
+99 silly reify mark deleted [ '/workspace/node_modules/@esbuild/darwin-x64' ]
+100 verbose reify failed optional dependency /workspace/node_modules/@esbuild/darwin-arm64
+101 silly reify mark deleted [ '/workspace/node_modules/@esbuild/darwin-arm64' ]
+102 verbose reify failed optional dependency /workspace/node_modules/@esbuild/android-x64
+103 silly reify mark deleted [ '/workspace/node_modules/@esbuild/android-x64' ]
+104 verbose reify failed optional dependency /workspace/node_modules/@esbuild/android-arm64
+105 silly reify mark deleted [ '/workspace/node_modules/@esbuild/android-arm64' ]
+106 verbose reify failed optional dependency /workspace/node_modules/@esbuild/android-arm
+107 silly reify mark deleted [ '/workspace/node_modules/@esbuild/android-arm' ]
+108 verbose reify failed optional dependency /workspace/node_modules/@esbuild/aix-ppc64
+109 silly reify mark deleted [ '/workspace/node_modules/@esbuild/aix-ppc64' ]
+110 silly tarball no local data for uhyphen@https://registry.npmjs.org/uhyphen/-/uhyphen-0.2.0.tgz. Extracting by manifest.
+111 silly tarball no local data for source-map-js@https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.1.tgz. Extracting by manifest.
+112 silly tarball no local data for picocolors@https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz. Extracting by manifest.
+113 silly tarball no local data for vite@https://registry.npmjs.org/vite/-/vite-5.4.21.tgz. Extracting by manifest.
+114 silly tarball no local data for nanoid@https://registry.npmjs.org/nanoid/-/nanoid-3.3.19.tgz. Extracting by manifest.
+115 silly tarball no local data for nth-check@https://registry.npmjs.org/nth-check/-/nth-check-3.0.1.tgz. Extracting by manifest.
+116 silly tarball no local data for rollup@https://registry.npmjs.org/rollup/-/rollup-4.63.5.tgz. Extracting by manifest.
+117 silly tarball no local data for linkedom@https://registry.npmjs.org/linkedom/-/linkedom-0.18.13.tgz. Extracting by manifest.
+118 silly tarball no local data for domutils@https://registry.npmjs.org/domutils/-/domutils-4.0.2.tgz. Extracting by manifest.
+119 silly tarball no local data for entities@https://registry.npmjs.org/entities/-/entities-8.1.0.tgz. Extracting by manifest.
+120 silly tarball no local data for html-escaper@https://registry.npmjs.org/html-escaper/-/html-escaper-3.0.3.tgz. Extracting by manifest.
+121 silly tarball no local data for domhandler@https://registry.npmjs.org/domhandler/-/domhandler-6.0.1.tgz. Extracting by manifest.
+122 silly tarball no local data for htmlparser2@https://registry.npmjs.org/htmlparser2/-/htmlparser2-10.1.0.tgz. Extracting by manifest.
+123 silly tarball no local data for @types/estree@https://registry.npmjs.org/@types/estree/-/estree-1.0.9.tgz. Extracting by manifest.
+124 silly tarball no local data for dom-serializer@https://registry.npmjs.org/dom-serializer/-/dom-serializer-3.1.1.tgz. Extracting by manifest.
+125 silly tarball no local data for css-select@https://registry.npmjs.org/css-select/-/css-select-7.0.0.tgz. Extracting by manifest.
+126 silly tarball no local data for css-what@https://registry.npmjs.org/css-what/-/css-what-8.0.0.tgz. Extracting by manifest.
+127 silly tarball no local data for @rollup/rollup-linux-arm64-musl@https://registry.npmjs.org/@rollup/rollup-linux-arm64-musl/-/rollup-linux-arm64-musl-4.63.5.tgz. Extracting by manifest.
+128 silly tarball no local data for @rollup/rollup-linux-arm64-gnu@https://registry.npmjs.org/@rollup/rollup-linux-arm64-gnu/-/rollup-linux-arm64-gnu-4.63.5.tgz. Extracting by manifest.
+129 silly tarball no local data for @esbuild/linux-arm64@https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.21.5.tgz. Extracting by manifest.
+130 silly tarball no local data for entities@https://registry.npmjs.org/entities/-/entities-7.0.1.tgz. Extracting by manifest.
+131 silly tarball no local data for domelementtype@https://registry.npmjs.org/domelementtype/-/domelementtype-2.3.0.tgz. Extracting by manifest.
+132 silly tarball no local data for domelementtype@https://registry.npmjs.org/domelementtype/-/domelementtype-3.0.0.tgz. Extracting by manifest.
+133 silly tarball no local data for esbuild@https://registry.npmjs.org/esbuild/-/esbuild-0.21.5.tgz. Extracting by manifest.
+134 silly tarball no local data for entities@https://registry.npmjs.org/entities/-/entities-4.5.0.tgz. Extracting by manifest.
+135 silly tarball no local data for boolbase@https://registry.npmjs.org/boolbase/-/boolbase-2.0.0.tgz. Extracting by manifest.
+136 silly tarball no local data for postcss@https://registry.npmjs.org/postcss/-/postcss-8.5.28.tgz. Extracting by manifest.
+137 silly tarball no local data for cssom@https://registry.npmjs.org/cssom/-/cssom-0.5.0.tgz. Extracting by manifest.
+138 silly tarball no local data for domutils@https://registry.npmjs.org/domutils/-/domutils-3.2.2.tgz. Extracting by manifest.
+139 silly tarball no local data for dom-serializer@https://registry.npmjs.org/dom-serializer/-/dom-serializer-2.0.0.tgz. Extracting by manifest.
+140 silly tarball no local data for domhandler@https://registry.npmjs.org/domhandler/-/domhandler-5.0.3.tgz. Extracting by manifest.
+141 http fetch GET 200 https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz 462ms (cache miss)
+142 http fetch GET 200 https://registry.npmjs.org/uhyphen/-/uhyphen-0.2.0.tgz 482ms (cache miss)
+143 http fetch GET 200 https://registry.npmjs.org/nanoid/-/nanoid-3.3.19.tgz 528ms (cache miss)
+144 http fetch GET 200 https://registry.npmjs.org/html-escaper/-/html-escaper-3.0.3.tgz 601ms (cache miss)
+145 http fetch GET 200 https://registry.npmjs.org/nth-check/-/nth-check-3.0.1.tgz 608ms (cache miss)
+146 http fetch GET 200 https://registry.npmjs.org/@types/estree/-/estree-1.0.9.tgz 605ms (cache miss)
+147 http fetch GET 200 https://registry.npmjs.org/domhandler/-/domhandler-6.0.1.tgz 607ms (cache miss)
+148 http fetch GET 200 https://registry.npmjs.org/domutils/-/domutils-4.0.2.tgz 645ms (cache miss)
+149 http fetch GET 200 https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.1.tgz 704ms (cache miss)
+150 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 767ms
+151 silly audit report {
+151 silly audit report   esbuild: [
+151 silly audit report     {
+151 silly audit report       id: 1102341,
+151 silly audit report       url: 'https://github.com/advisories/GHSA-67mh-4wv8-2f99',
+151 silly audit report       title: 'esbuild enables any website to send any requests to the development server and read the response',
+151 silly audit report       severity: 'moderate',
+151 silly audit report       vulnerable_versions: '<=0.24.2',
+151 silly audit report       cwe: [Array],
+151 silly audit report       cvss: [Object]
+151 silly audit report     }
+151 silly audit report   ],
+151 silly audit report   vite: [
+151 silly audit report     {
+151 silly audit report       id: 1120784,
+151 silly audit report       url: 'https://github.com/advisories/GHSA-v6wh-96g9-6wx3',
+151 silly audit report       title: 'launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows',
+151 silly audit report       severity: 'moderate',
+151 silly audit report       vulnerable_versions: '<=6.4.2',
+151 silly audit report       cwe: [Array],
+151 silly audit report       cvss: [Object]
+151 silly audit report     },
+151 silly audit report     {
+151 silly audit report       id: 1116229,
+151 silly audit report       url: 'https://github.com/advisories/GHSA-4w7w-66w2-5vf9',
+151 silly audit report       title: 'Vite Vulnerable to Path Traversal in Optimized Deps `.map` Handling',
+151 silly audit report       severity: 'moderate',
+151 silly audit report       vulnerable_versions: '<=6.4.1',
+151 silly audit report       cwe: [Array],
+151 silly audit report       cvss: [Object]
+151 silly audit report     },
+151 silly audit report     {
+151 silly audit report       id: 1123525,
+151 silly audit report       url: 'https://github.com/advisories/GHSA-fx2h-pf6j-xcff',
+151 silly audit report       title: 'vite: `server.fs.deny` bypass on Windows alternate paths',
+151 silly audit report       severity: 'high',
+151 silly audit report       vulnerable_versions: '<=6.4.2',
+151 silly audit report       cwe: [Array],
+151 silly audit report       cvss: [Object]
+151 silly audit report     }
+151 silly audit report   ]
+151 silly audit report }
+152 silly packumentCache corgi:https://registry.npmjs.org/esbuild cache-miss
+153 silly packumentCache corgi:https://registry.npmjs.org/vite cache-miss
+154 http fetch GET 200 https://registry.npmjs.org/htmlparser2/-/htmlparser2-10.1.0.tgz 737ms (cache miss)
+155 http fetch GET 200 https://registry.npmjs.org/dom-serializer/-/dom-serializer-3.1.1.tgz 750ms (cache miss)
+156 http fetch GET 200 https://registry.npmjs.org/css-what/-/css-what-8.0.0.tgz 836ms (cache miss)
+157 http fetch GET 200 https://registry.npmjs.org/entities/-/entities-8.1.0.tgz 873ms (cache miss)
+158 http fetch GET 200 https://registry.npmjs.org/cssom/-/cssom-0.5.0.tgz 921ms (cache miss)
+159 http fetch GET 200 https://registry.npmjs.org/css-select/-/css-select-7.0.0.tgz 930ms (cache miss)
+160 http fetch GET 200 https://registry.npmjs.org/domutils/-/domutils-3.2.2.tgz 976ms (cache miss)
+161 http fetch GET 200 https://registry.npmjs.org/dom-serializer/-/dom-serializer-2.0.0.tgz 1020ms (cache miss)
+162 http fetch GET 200 https://registry.npmjs.org/domelementtype/-/domelementtype-2.3.0.tgz 1050ms (cache miss)
+163 http fetch GET 200 https://registry.npmjs.org/domhandler/-/domhandler-5.0.3.tgz 1037ms (cache miss)
+164 http fetch GET 200 https://registry.npmjs.org/domelementtype/-/domelementtype-3.0.0.tgz 1073ms (cache miss)
+165 http fetch GET 200 https://registry.npmjs.org/boolbase/-/boolbase-2.0.0.tgz 1080ms (cache miss)
+166 http fetch GET 200 https://registry.npmjs.org/vite/-/vite-5.4.21.tgz 1106ms (cache miss)
+167 http fetch GET 200 https://registry.npmjs.org/postcss/-/postcss-8.5.28.tgz 1107ms (cache miss)
+168 http fetch GET 200 https://registry.npmjs.org/@rollup/rollup-linux-arm64-gnu/-/rollup-linux-arm64-gnu-4.63.5.tgz 1148ms (cache miss)
+169 http fetch GET 200 https://registry.npmjs.org/rollup/-/rollup-4.63.5.tgz 1224ms (cache miss)
+170 http fetch GET 200 https://registry.npmjs.org/esbuild 537ms (cache miss)
+171 silly packumentCache corgi:https://registry.npmjs.org/esbuild set size:undefined disposed:false
+172 http fetch GET 200 https://registry.npmjs.org/@rollup/rollup-linux-arm64-musl/-/rollup-linux-arm64-musl-4.63.5.tgz 1342ms (cache miss)
+173 http fetch GET 200 https://registry.npmjs.org/esbuild/-/esbuild-0.21.5.tgz 1410ms (cache miss)
+174 http fetch GET 200 https://registry.npmjs.org/entities/-/entities-4.5.0.tgz 1413ms (cache miss)
+175 http fetch GET 200 https://registry.npmjs.org/entities/-/entities-7.0.1.tgz 1448ms (cache miss)
+176 http fetch GET 200 https://registry.npmjs.org/vite 738ms (cache miss)
+177 silly packumentCache corgi:https://registry.npmjs.org/vite set size:undefined disposed:false
+178 http fetch GET 200 https://registry.npmjs.org/linkedom/-/linkedom-0.18.13.tgz 1660ms (cache miss)
+179 http fetch GET 200 https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.21.5.tgz 4811ms (cache miss)
+180 info run esbuild@0.21.5 postinstall node_modules/esbuild node install.js
+181 info run esbuild@0.21.5 postinstall { code: 0, signal: null }
+182 silly ADD node_modules/vite
+183 silly ADD node_modules/uhyphen
+184 silly ADD node_modules/source-map-js
+185 silly ADD node_modules/rollup
+186 silly ADD node_modules/postcss
+187 silly ADD node_modules/picocolors
+188 silly ADD node_modules/nth-check
+189 silly ADD node_modules/nanoid
+190 silly ADD node_modules/linkedom
+191 silly ADD node_modules/htmlparser2
+192 silly ADD node_modules/htmlparser2/node_modules/entities
+193 silly ADD node_modules/htmlparser2/node_modules/domutils
+194 silly ADD node_modules/htmlparser2/node_modules/domhandler
+195 silly ADD node_modules/htmlparser2/node_modules/domelementtype
+196 silly ADD node_modules/htmlparser2/node_modules/dom-serializer
+197 silly ADD node_modules/htmlparser2/node_modules/dom-serializer/node_modules/entities
+198 silly ADD node_modules/html-escaper
+199 silly ADD
+200 silly ADD node_modules/esbuild
+201 silly ADD node_modules/entities
+202 silly ADD node_modules/domutils
+203 silly ADD node_modules/domhandler
+204 silly ADD node_modules/domelementtype
+205 silly ADD node_modules/dom-serializer
+206 silly ADD node_modules/cssom
+207 silly ADD node_modules/css-what
+208 silly ADD node_modules/css-select
+209 silly ADD node_modules/boolbase
+210 silly ADD node_modules/@types/estree
+211 silly ADD
+212 silly ADD
+213 silly ADD
+214 silly ADD
+215 silly ADD
+216 silly ADD
+217 silly ADD
+218 silly ADD
+219 silly ADD
+220 silly ADD
+221 silly ADD
+222 silly ADD
+223 silly ADD
+224 silly ADD
+225 silly ADD
+226 silly ADD node_modules/@rollup/rollup-linux-arm64-musl
+227 silly ADD node_modules/@rollup/rollup-linux-arm64-gnu
+228 silly ADD
+229 silly ADD
+230 silly ADD
+231 silly ADD
+232 silly ADD
+233 silly ADD
+234 silly ADD
+235 silly ADD
+236 silly ADD
+237 silly ADD
+238 silly ADD
+239 silly ADD
+240 silly ADD
+241 silly ADD
+242 silly ADD
+243 silly ADD
+244 silly ADD
+245 silly ADD
+246 silly ADD
+247 silly ADD
+248 silly ADD
+249 silly ADD
+250 silly ADD node_modules/@esbuild/linux-arm64
+251 silly ADD
+252 silly ADD
+253 silly ADD
+254 silly ADD
+255 silly ADD
+256 silly ADD
+257 silly ADD
+258 silly ADD
+259 silly ADD
+260 verbose cwd /workspace
+261 verbose os Linux 6.12.69-linuxkit
+262 verbose node v22.23.2
+263 verbose npm  v10.8.2
+264 verbose exit 0
+265 info ok

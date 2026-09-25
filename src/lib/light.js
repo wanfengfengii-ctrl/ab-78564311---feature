@@ -116,6 +116,8 @@ export function makeCase(idx) {
     winLen: '',
     winLimit: '',
     totalLimit: '',
+    recovery: '', // 光损恢复系数 k（h⁻¹）
+    residLimit: '', // 允许残余负担（μW·h/cm²）
     lamps: [makeLamp(1), makeLamp(2), makeLamp(3)],
   };
 }

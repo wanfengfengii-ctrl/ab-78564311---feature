@@ -5,16 +5,25 @@ import {
   totalDose, maxSlidingDose, firstExceedance,
 } from './light.js';
 
-// 草稿内容指纹：仅依赖输入内容（与编辑顺序、id 无关也无妨——字段值变即失效）
+// 草稿内容指纹：仅依赖输入内容（与编辑顺序、id 无关也无妨——字段值变即失效）。
+// 剂量复核不读取恢复参数（recovery/residLimit），故其指纹忽略这两个字段：
+// 仅调整恢复参数时，已合格的剂量结论继续有效。
 export function draftFingerprint(draft) {
-  return JSON.stringify(normalize(draft));
+  return JSON.stringify(normalize(draft, true));
 }
-function normalize(v) {
-  if (Array.isArray(v)) return v.map(normalize);
+
+// 恢复复核指纹：剂量输入 + 每柜恢复参数任一变化即失效
+export function recoveryFingerprint(draft) {
+  return JSON.stringify(normalize(draft, false));
+}
+
+function normalize(v, skipRecovery = false) {
+  if (Array.isArray(v)) return v.map((x) => normalize(x, skipRecovery));
   if (v && typeof v === 'object') {
     return Object.keys(v).sort().reduce((o, k) => {
       if (k === 'id') return o; // 行/灯/柜的内部 id 不影响结论
-      o[k] = normalize(v[k]);
+      if (skipRecovery && (k === 'recovery' || k === 'residLimit')) return o;
+      o[k] = normalize(v[k], skipRecovery);
       return o;
     }, {});
   }
@@ -60,7 +69,7 @@ export function analyzeCase(cs) {
 }
 
 // 为每个分段标注起点处的灯号联动事件（左闭右开：到 off 即熄灭）
-function withEvents(pieces, intervals) {
+export function withEvents(pieces, intervals) {
   return pieces.map((p) => {
     const on = [], off = [];
     for (const iv of intervals) {

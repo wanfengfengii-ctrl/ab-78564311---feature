@@ -1,10 +1,12 @@
-// 本机持久化：草稿与最近一次有效复核结果保存在浏览器 localStorage。
-// 复核结果带草稿指纹；草稿一旦变更（指纹不符），旧结论立即失效、不再显示。
+// 本机持久化：草稿、最近一次有效剂量复核结果、最近一次有效恢复复核结果
+// 均保存在浏览器 localStorage。结论各自带草稿指纹；草稿（或恢复参数）一旦
+// 变更导致指纹不符，对应旧结论立即失效、不再显示。
 import { Rat, makeDraft } from './light.js';
-import { draftFingerprint } from './review.js';
+import { draftFingerprint, recoveryFingerprint } from './review.js';
 
 const DRAFT_KEY = 'paper-light:draft:v1';
 const REVIEW_KEY = 'paper-light:review:v1';
+const RECOVERY_KEY = 'paper-light:recovery:v1';
 
 export function loadDraft() {
   try {
@@ -46,6 +48,32 @@ export function loadReview(draft) {
 
 export function clearReview() {
   localStorage.removeItem(REVIEW_KEY);
+}
+
+// ---- 恢复复核：独立存储与指纹（恢复参数改动只使恢复结论失效） ----
+
+export function saveRecovery(draft, recovery) {
+  localStorage.setItem(RECOVERY_KEY, JSON.stringify({
+    fingerprint: recoveryFingerprint(draft),
+    at: recovery.at,
+    review: serializeReview(recovery),
+  }));
+}
+
+export function loadRecovery(draft) {
+  try {
+    const raw = localStorage.getItem(RECOVERY_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw, reviver);
+    if (!parsed || parsed.fingerprint !== recoveryFingerprint(draft)) return null;
+    return { at: parsed.at, review: parsed.review };
+  } catch {
+    return null;
+  }
+}
+
+export function clearRecovery() {
+  localStorage.removeItem(RECOVERY_KEY);
 }
 
 // Rat（字段含 bigint）无法直接 JSON 化，以 {__rat:'s/n/d'} 中转
